@@ -1,10 +1,20 @@
 import { createContext, useEffect, useReducer } from "react";
 
 export const GlobalContext = createContext();
-const initialState = {
-  cart: [],
-  totalPrice: 0,
-  totalAmount: 0,
+// const initialState = {
+//   cart: [],
+//   totalPrice: 0,
+//   totalAmount: 0,
+// };
+console.log(localStorage.getItem("data"));
+const initialState = () => {
+  return localStorage.getItem("data")
+    ? JSON.parse(localStorage.getItem("data"))
+    : {
+        cart: [],
+        totalPrice: 0,
+        totalAmount: 0,
+      };
 };
 
 const reducer = (state, action) => {
@@ -66,12 +76,16 @@ const reducer = (state, action) => {
 };
 
 export const GlobalContextProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, initialState());
 
   useEffect(() => {
     dispatch({
       type: "CALCULATE_TOTAL",
     });
+  }, [state.cart]);
+
+  useEffect(() => {
+    localStorage.setItem("data", JSON.stringify(state));
   }, [state.cart]);
 
   return (
